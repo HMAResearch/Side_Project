@@ -36,3 +36,18 @@ bedtbl <- dat %>%
   na.omit() %>%
   dcast(Year ~ System_member+bed_bucket, value.var="Freq")
 write.csv(bedtbl,"bedtbl.csv",row.names = FALSE)
+
+
+
+tbl <- dat %>% filter(Ownership == "Community") %>%
+  mutate(Segment = case_when(Sub.ownership == "Community-NFP" & Total_hospital_beds >= 250 ~ "NFP-Large",
+                             Sub.ownership == "Community-NFP" & Total_hospital_beds < 250 ~ "NFP-Small",
+                             Sub.ownership == "Community-IO" & Total_hospital_beds >= 250 ~ "IO-Large",
+                             Sub.ownership == "Community-IO" & Total_hospital_beds < 250 ~ "IO-Small"
+                             )) %>%
+  group_by(Year, System_member, Segment) %>%
+  summarise(Freq = n()) %>%
+  na.omit() %>%
+  dcast(Year ~ System_member + Segment, value.var="Freq")
+
+write.csv(tbl,"count.csv",row.names = FALSE)
